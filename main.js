@@ -51,6 +51,9 @@ class Player {
         this.moveright = false;
         this.moveup = false;
         this.movedown = false;
+
+        this.fire_rate = 0.5;
+        this.fire_delta = 0;
     }
     chkptr(ptr) {
         this.resetflags();
@@ -86,18 +89,57 @@ class Player {
         this.moveup = false;
     }
     update(ts,dt) {
-        if (this.moveleft) {
-            this.sprite.x -= (dt/1000*this.speed);
+        if (this.moving) {
+            if (this.moveleft) {
+                this.sprite.x -= (dt/1000*this.speed);
+            }
+            if (this.moveright) {
+                this.sprite.x += (dt/1000* this.speed);
+            }
+            if (this.movedown) {
+                this.sprite.y += (dt/1000*this.speed);
+            }
+            if (this.moveup) {
+                this.sprite.y -= (dt/1000*this.speed);
+            }    
+        } else {
+            // firing!!!
+            this.fire_delta += (dt/1000);
+            if (this.fire_delta>this.fire_rate) {
+                let bg = this.scene.get_nearest_badguy();
+                let angle = Math.atan2(bg.y - this.sprite.y, bg.x - this.sprite.x);
+                let dx = this.speed*Math.cos(angle);
+                let dy = this.speed*Math.sin(angle);
+                this.scene.bullets.push(
+                    new Bullet(this.sprite.x,this.sprite.y,dx,dy,this.scene));
+                this.fire_delta = 0;
+            }
         }
-        if (this.moveright) {
-            this.sprite.x += (dt/1000* this.speed);
+    }
+}
+
+class Bullet {
+    constructor(x,y,dx,dy,scene) {
+        this.dx = dx;
+        this.dy = dy;
+        this.scene = scene;
+        this.sprite = scene.add.sprite(x,y,"bullet");
+        this.speed = 80;
+        this.alive = true;
+        this.count = 0;
+    }
+    update(ts,dt) {
+        this.count++;
+        if (this.count>64) {
+            this.alive = false;
         }
-        if (this.movedown) {
-            this.sprite.y += (dt/1000*this.speed);
+        if (this.alive) {
+            this.sprite.x += this.speed * dt/1000;
+            this.sprite.y += this.speed * dt/1000;    
         }
-        if (this.moveup) {
-            this.sprite.y -= (dt/1000*this.speed);
-        }
+    }
+    remove() {
+        this.sprite.destroy();
     }
 }
 
@@ -106,10 +148,15 @@ class GameScene extends Phaser.Scene {
         super("game");
         this.badguy = null;
         this.player = null;
+        this.bullets = [];
     }
     preload() {
         this.load.image("badguy", "CadetBlue.png");
         this.load.image("player", "IndianRed.png");
+        this.load.image("bullet", "AntiqueWhite.png");
+    }
+    get_nearest_badguy() {
+        return this.badguy;
     }
     create() {
         this.badguy = new BadGuy(100,100,this);
@@ -129,6 +176,15 @@ class GameScene extends Phaser.Scene {
         // dt is in ms
         this.player.update(timestep,dt);
         this.badguy.update(timestep,dt);
+        for (let i=0;i<this.bullets.length;i++) {
+            this.bullets[i].update(timestep,dt);
+        }
+        for (let i=0;i<this.bullets.length;i++) {
+          if (this.bullets[i].alive==false) {
+              this.bullets[i].remove();
+              this.bullets.splice(i,1);
+          }
+        }
     }
 }
 
