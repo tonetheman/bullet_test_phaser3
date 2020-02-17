@@ -112,7 +112,7 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
             this.fire_delta += (dt);
             if (this.fire_delta>this.fire_rate) {
                 //console.log("bullet now");
-                let bg = this.scene.get_nearest_badguy();
+                let bg = this.scene.get_nearest_badguy(this.x,this.y);
                 //console.log(this.scene.get_nearest_badguy());
                 let angle = Math.atan2(bg.y - this.y, 
                     bg.x - this.x);
@@ -166,8 +166,20 @@ class GameScene extends Phaser.Scene {
         this.load.image("player", "IndianRed.png");
         this.load.image("bullet", "AntiqueWhite.png");
     }
-    get_nearest_badguy() {
-        return this.badguy;
+    get_nearest_badguy(x,y) {
+        // not working
+        let a = this.badguy_group.getChildren();
+        let index = -1;
+        let m = 1000000;
+        for (let i=0;i<a.length;i++) {
+            let dist = ((x-a[i].x)*(x-a[i].x))+((y-a[i].y)*(y-a[i].y));
+            if (dist<m) {
+                index = i;
+                m = dist;
+            }
+        }
+        // TODO: need to check for no bad guys
+        return a[0];
     }
     create() {
         this.player_group = this.add.group();
