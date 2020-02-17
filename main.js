@@ -26,24 +26,26 @@ class BootScene extends Phaser.Scene {
     }
 }
 
-class BadGuy {
-    constructor(x,y,scene) {
-        this.scene = scene;
-        this.sprite = scene.add.sprite(x,y,"badguy");
-        this.speed = 100;
+class BadGuySprite extends Phaser.GameObjects.Sprite {
+    constructor(scene,x,y,key) {
+        super(scene,x,y,key);
+        scene.add.existing(this);
+        this.speed = 80;
     }
     update(ts,dt) {
-        this.sprite.x += (this.speed * dt);
-        if (this.sprite.x>W) {
-            this.sprite.x = 0;
+        this.x += (this.speed * dt/1000);
+        if (this.x>W) {
+            this.x = 0;
         }
     }
 }
 
-class Player {
-    constructor(x,y,scene) {
-        this.scene = scene;
-        this.sprite = scene.add.sprite(x,y,"player");
+class PlayerSprite extends Phaser.GameObjects.Sprite {
+    constructor(scene,x,y,key) {
+        super(scene,x,y,key);
+        scene.add.existing(this);
+
+        // my stuff
         this.speed = 90;
 
         // move flags
@@ -58,15 +60,15 @@ class Player {
     }
     chkptr(ptr) {
         this.resetflags();
-        if (ptr.x>this.sprite.x) {
+        if (ptr.x>this.x) {
             this.moveright = true;
-        } else if (ptr.x<this.sprite.x) {
+        } else if (ptr.x<this.x) {
             this.moveleft = true;
         }
-        if (ptr.y<this.sprite.y) {
+        if (ptr.y<this.y) {
             this.moveup = true;
         }
-        if (ptr.y>this.sprite.y) {
+        if (ptr.y>this.y) {
             this.movedown = true;
         }
     }
@@ -90,18 +92,19 @@ class Player {
         this.moveup = false;
     }
     update(ts,dt) {
+        dt=dt/1000.0;
         if (this.moving) {
             if (this.moveleft) {
-                this.sprite.x -= (dt*this.speed);
+                this.x -= (dt*this.speed);
             }
             if (this.moveright) {
-                this.sprite.x += (dt* this.speed);
+                this.x += (dt* this.speed);
             }
             if (this.movedown) {
-                this.sprite.y += (dt*this.speed);
+                this.y += (dt*this.speed);
             }
             if (this.moveup) {
-                this.sprite.y -= (dt*this.speed);
+                this.y -= (dt*this.speed);
             }    
         } else {
             // firing!!!
@@ -110,17 +113,40 @@ class Player {
                 //console.log("bullet now");
                 let bg = this.scene.get_nearest_badguy();
                 //console.log(this.scene.get_nearest_badguy());
-                let angle = Math.atan2(bg.sprite.y - this.sprite.y, 
-                    bg.sprite.x - this.sprite.x);
+                let angle = Math.atan2(bg.y - this.y, 
+                    bg.x - this.x);
                 //console.log("angle",angle)
                 let dx = BULLET_SPEED*Math.cos(angle);
                 let dy = BULLET_SPEED*Math.sin(angle);
                 //console.log(this.sprite.x,this.sprite.y,
                 //    dx,dy);
                 this.scene.bullets.push(
-                    new Bullet(this.sprite.x,this.sprite.y,dx,dy,this.scene));
+                    new Bullet(this.x,this.y,dx,dy,this.scene));
                 this.fire_delta = 0;
             }
+        }
+    }
+
+}
+
+class BulletSprite extends Phaser.GameObjects.Sprite {
+    constructor(scene,x,y,key,dx,dy) {
+        super(scene,x,y,key);
+        scene.add.existing(this);
+        this.dx = dx;
+        this.dy = dy;
+        this.speed = BULLET_SPEED;
+        this.alive = true;
+        this.count = 0;
+    }
+    update(ts,dt) {
+        this.count++;
+        if (this.count>64) {
+            this.alive = false;
+        }
+        if (this.alive) {
+            this.x += (this.dx * dt);
+            this.y += (this.dy * dt);    
         }
     }
 }
@@ -153,9 +179,10 @@ class Bullet {
 class GameScene extends Phaser.Scene {
     constructor() {
         super("game");
-        this.badguy = null;
-        this.player = null;
         this.bullets = [];
+        this.bullet_group = null;
+        this.badguy_group = null;
+        this.badguy = null;
     }
     preload() {
         this.load.image("badguy", "CadetBlue.png");
@@ -166,24 +193,37 @@ class GameScene extends Phaser.Scene {
         return this.badguy;
     }
     create() {
-        this.badguy = new BadGuy(100,100,this);
-        this.player = new Player(400,100,this);
+        this.player_group = this.add.group();
+        this.player_group.runChildUpdate = true;
+
+        this.bullet_group = this.add.group();
+        this.bullet_group.runChildUpdate = true;
+        
+        this.badguy_group = this.add.group();
+        this.badguy_group.runChildUpdate = true;
+
+        // still need this reference until
+        // i get nearest bad guy function using group
+        this.badguy = new BadGuySprite(this,100,100,"badguy")
+        this.badguy_group.add(this.badguy);
+        this.badguy_group.add(new BadGuySprite(this,100,400,"badguy"));
+
+        let player = new PlayerSprite(this,400,150,"player");
+        this.player_group.add(player);
         this.input.on("pointerdown", (ptr) => {
-            this.player.pointerdown(ptr);
+            player.pointerdown(ptr);
         });
         this.input.on("pointerup", (ptr) => {
-            this.player.pointerup();
+            player.pointerup();
         });
         this.input.on("pointermove", (ptr) => {
-            this.player.pointermove(ptr);
+            player.pointermove(ptr);
         });
     }
     update(timestep, dt) {
         // timestep always going up
         // dt is in ms
         dt  = dt/1000.0;
-        this.player.update(timestep,dt);
-        this.badguy.update(timestep,dt);
         for (let i=0;i<this.bullets.length;i++) {
             this.bullets[i].update(timestep,dt);
         }
@@ -194,6 +234,7 @@ class GameScene extends Phaser.Scene {
               this.bullets.splice(i,1);
           }
         }
+        
     }
 }
 
