@@ -2,6 +2,7 @@
 let game = null;
 let W = 600;
 let H = 800;
+let BULLET_SPEED = 80;
 
 let scenes = [];
 let gameConfig = {
@@ -108,8 +109,8 @@ class Player {
             if (this.fire_delta>this.fire_rate) {
                 let bg = this.scene.get_nearest_badguy();
                 let angle = Math.atan2(bg.y - this.sprite.y, bg.x - this.sprite.x);
-                let dx = this.speed*Math.cos(angle);
-                let dy = this.speed*Math.sin(angle);
+                let dx = BULLET_SPEED*Math.cos(angle);
+                let dy = BULLET_SPEED*Math.sin(angle);
                 this.scene.bullets.push(
                     new Bullet(this.sprite.x,this.sprite.y,dx,dy,this.scene));
                 this.fire_delta = 0;
@@ -124,7 +125,7 @@ class Bullet {
         this.dy = dy;
         this.scene = scene;
         this.sprite = scene.add.sprite(x,y,"bullet");
-        this.speed = 80;
+        this.speed = BULLET_SPEED;
         this.alive = true;
         this.count = 0;
     }
@@ -134,8 +135,8 @@ class Bullet {
             this.alive = false;
         }
         if (this.alive) {
-            this.sprite.x += this.speed * dt/1000;
-            this.sprite.y += this.speed * dt/1000;    
+            this.sprite.x += (this.dx * dt/1000);
+            this.sprite.y += (this.dy * dt/1000);    
         }
     }
     remove() {
