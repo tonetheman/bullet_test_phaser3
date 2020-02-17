@@ -107,10 +107,16 @@ class Player {
             // firing!!!
             this.fire_delta += (dt/1000);
             if (this.fire_delta>this.fire_rate) {
+                //console.log("bullet now");
                 let bg = this.scene.get_nearest_badguy();
-                let angle = Math.atan2(bg.y - this.sprite.y, bg.x - this.sprite.x);
+                //console.log(this.scene.get_nearest_badguy());
+                let angle = Math.atan2(bg.sprite.y - this.sprite.y, 
+                    bg.sprite.x - this.sprite.x);
+                //console.log("angle",angle)
                 let dx = BULLET_SPEED*Math.cos(angle);
                 let dy = BULLET_SPEED*Math.sin(angle);
+                //console.log(this.sprite.x,this.sprite.y,
+                //    dx,dy);
                 this.scene.bullets.push(
                     new Bullet(this.sprite.x,this.sprite.y,dx,dy,this.scene));
                 this.fire_delta = 0;
@@ -182,6 +188,7 @@ class GameScene extends Phaser.Scene {
         }
         for (let i=0;i<this.bullets.length;i++) {
           if (this.bullets[i].alive==false) {
+              //console.log("removing bullet",i);
               this.bullets[i].remove();
               this.bullets.splice(i,1);
           }
