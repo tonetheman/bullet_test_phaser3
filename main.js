@@ -3,6 +3,8 @@ let game = null;
 let W = 600;
 let H = 800;
 let BULLET_SPEED = 200;
+let BADGUYCOUNT=10;
+let PLAYER_FIRE_RATE = 0.3;
 
 let scenes = [];
 let gameConfig = {
@@ -32,11 +34,37 @@ class BadGuySprite extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
         this.speed = 80;
     }
-    update(ts,dt) {
-        this.x += (this.speed * dt/1000);
+    bounds() {
         if (this.x>W) {
             this.x = 0;
         }
+        if (this.x<0) {
+            this.x = W;
+        }
+        if (this.y>H) {
+            this.y = 0;
+        }
+        if (this.y<0) {
+            this.y = H;
+        }
+    }
+    update(ts,dt) {
+        this.x += (this.speed * dt/1000);
+        this.bounds();
+    }
+}
+
+class SimpleBadGuy extends BadGuySprite {
+    constructor(scene,x,y,key,dx,dy) {
+        super(scene,x,y,key);
+        this.dx = dx;
+        this.dy = dy;
+    }
+    update(ts,dt) {
+        dt = dt/1000;
+        this.x += (this.dx * dt);
+        this.y += (this.dy * dt);
+        this.bounds();
     }
 }
 
@@ -56,7 +84,7 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
         this.moveup = false;
         this.movedown = false;
 
-        this.fire_rate = 0.5;
+        this.fire_rate = PLAYER_FIRE_RATE;
         this.fire_delta = 0;
     }
     chkptr(ptr) {
@@ -159,7 +187,6 @@ class GameScene extends Phaser.Scene {
         super("game");
         this.bullet_group = null;
         this.badguy_group = null;
-        this.badguy = null;
     }
     preload() {
         this.load.image("badguy", "CadetBlue.png");
@@ -199,11 +226,17 @@ class GameScene extends Phaser.Scene {
         this.badguy_group = this.add.group();
         this.badguy_group.runChildUpdate = true;
 
-        // still need this reference until
-        // i get nearest bad guy function using group
-        this.badguy = new BadGuySprite(this,100,100,"badguy")
-        this.badguy_group.add(this.badguy);
-        this.badguy_group.add(new BadGuySprite(this,100,400,"badguy"));
+        for (let i=0;i<BADGUYCOUNT;i++) {
+            let dx = Phaser.Math.Between(-150,150);
+            let dy = Phaser.Math.Between(-150,150);
+            let x = Phaser.Math.Between(0,W);
+            let y = Phaser.Math.Between(0,H);
+            this.badguy_group.add(
+                new SimpleBadGuy(this,x,y,"badguy",dx,dy))
+        }
+        //this.badguy = new BadGuySprite(this,100,100,"badguy")
+        //this.badguy_group.add(new BadGuySprite(this,100,100,"badguy"));
+        //this.badguy_group.add(new BadGuySprite(this,100,400,"badguy"));
 
         let player = new PlayerSprite(this,400,150,"player");
         this.player_group.add(player);
