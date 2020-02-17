@@ -172,13 +172,21 @@ class GameScene extends Phaser.Scene {
         let index = -1;
         let m = 1000000;
         for (let i=0;i<a.length;i++) {
-            let dist = ((x-a[i].x)*(x-a[i].x))+((y-a[i].y)*(y-a[i].y));
+            let dude = a[i];
+            let tmp1 = dude.x-x;
+            let tmp2 = dude.y-y;
+            // took out the sqrt
+            //let dist = Math.sqrt((tmp1*tmp1)+(tmp2*tmp2));
+            let dist = ((tmp1*tmp1)+(tmp2*tmp2));
             if (dist<m) {
-                index = i;
                 m = dist;
+                index = i;
             }
         }
         // TODO: need to check for no bad guys
+        if (index!=-1) {
+            return a[index];
+        }
         return a[0];
     }
     create() {
