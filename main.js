@@ -21,7 +21,7 @@ class BootScene extends Phaser.Scene {
         super("boot");
     }
     preload() {
-        console.log("boot preload");
+        
     }
     create() {
         this.scene.start("game");
@@ -72,7 +72,6 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
     constructor(scene,x,y,key) {
         super(scene,x,y,key);
         scene.add.existing(this);
-        console.log(this);
 
         // my stuff
         this.speed = 90;
@@ -139,16 +138,11 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
             // firing!!!
             this.fire_delta += (dt);
             if (this.fire_delta>this.fire_rate) {
-                //console.log("bullet now");
                 let bg = this.scene.get_nearest_badguy(this.x,this.y);
-                //console.log(this.scene.get_nearest_badguy());
                 let angle = Math.atan2(bg.y - this.y, 
                     bg.x - this.x);
-                //console.log("angle",angle)
                 let dx = BULLET_SPEED*Math.cos(angle);
                 let dy = BULLET_SPEED*Math.sin(angle);
-                //console.log(this.sprite.x,this.sprite.y,
-                //    dx,dy);
                 this.scene.bullet_group.add(
                     new BulletSprite(this.scene,this.x,this.y,"bullet",
                     dx,dy));
@@ -234,9 +228,6 @@ class GameScene extends Phaser.Scene {
             this.badguy_group.add(
                 new SimpleBadGuy(this,x,y,"badguy",dx,dy))
         }
-        //this.badguy = new BadGuySprite(this,100,100,"badguy")
-        //this.badguy_group.add(new BadGuySprite(this,100,100,"badguy"));
-        //this.badguy_group.add(new BadGuySprite(this,100,400,"badguy"));
 
         let player = new PlayerSprite(this,400,150,"player");
         this.player_group.add(player);
