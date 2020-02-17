@@ -44,6 +44,7 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
     constructor(scene,x,y,key) {
         super(scene,x,y,key);
         scene.add.existing(this);
+        console.log(this);
 
         // my stuff
         this.speed = 90;
@@ -120,8 +121,9 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
                 let dy = BULLET_SPEED*Math.sin(angle);
                 //console.log(this.sprite.x,this.sprite.y,
                 //    dx,dy);
-                this.scene.bullets.push(
-                    new Bullet(this.x,this.y,dx,dy,this.scene));
+                this.scene.bullet_group.add(
+                    new BulletSprite(this.scene,this.x,this.y,"bullet",
+                    dx,dy));
                 this.fire_delta = 0;
             }
         }
@@ -136,50 +138,25 @@ class BulletSprite extends Phaser.GameObjects.Sprite {
         this.dx = dx;
         this.dy = dy;
         this.speed = BULLET_SPEED;
-        this.alive = true;
         this.count = 0;
     }
     update(ts,dt) {
+        dt=dt/1000.0;
         this.count++;
         if (this.count>64) {
-            this.alive = false;
+            this.setActive(false);
+            this.scene.bullet_group.killAndHide(this);
         }
-        if (this.alive) {
+        if (this.active) {
             this.x += (this.dx * dt);
             this.y += (this.dy * dt);    
         }
     }
 }
 
-class Bullet {
-    constructor(x,y,dx,dy,scene) {
-        this.dx = dx;
-        this.dy = dy;
-        this.scene = scene;
-        this.sprite = scene.add.sprite(x,y,"bullet");
-        this.speed = BULLET_SPEED;
-        this.alive = true;
-        this.count = 0;
-    }
-    update(ts,dt) {
-        this.count++;
-        if (this.count>64) {
-            this.alive = false;
-        }
-        if (this.alive) {
-            this.sprite.x += (this.dx * dt);
-            this.sprite.y += (this.dy * dt);    
-        }
-    }
-    remove() {
-        this.sprite.destroy();
-    }
-}
-
 class GameScene extends Phaser.Scene {
     constructor() {
         super("game");
-        this.bullets = [];
         this.bullet_group = null;
         this.badguy_group = null;
         this.badguy = null;
@@ -198,7 +175,7 @@ class GameScene extends Phaser.Scene {
 
         this.bullet_group = this.add.group();
         this.bullet_group.runChildUpdate = true;
-        
+
         this.badguy_group = this.add.group();
         this.badguy_group.runChildUpdate = true;
 
@@ -219,22 +196,6 @@ class GameScene extends Phaser.Scene {
         this.input.on("pointermove", (ptr) => {
             player.pointermove(ptr);
         });
-    }
-    update(timestep, dt) {
-        // timestep always going up
-        // dt is in ms
-        dt  = dt/1000.0;
-        for (let i=0;i<this.bullets.length;i++) {
-            this.bullets[i].update(timestep,dt);
-        }
-        for (let i=0;i<this.bullets.length;i++) {
-          if (this.bullets[i].alive==false) {
-              //console.log("removing bullet",i);
-              this.bullets[i].remove();
-              this.bullets.splice(i,1);
-          }
-        }
-        
     }
 }
 
