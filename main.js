@@ -33,7 +33,7 @@ class BadGuy {
         this.speed = 100;
     }
     update(ts,dt) {
-        this.sprite.x += (this.speed * dt/1000.0);
+        this.sprite.x += (this.speed * dt);
         if (this.sprite.x>W) {
             this.sprite.x = 0;
         }
@@ -92,20 +92,20 @@ class Player {
     update(ts,dt) {
         if (this.moving) {
             if (this.moveleft) {
-                this.sprite.x -= (dt/1000*this.speed);
+                this.sprite.x -= (dt*this.speed);
             }
             if (this.moveright) {
-                this.sprite.x += (dt/1000* this.speed);
+                this.sprite.x += (dt* this.speed);
             }
             if (this.movedown) {
-                this.sprite.y += (dt/1000*this.speed);
+                this.sprite.y += (dt*this.speed);
             }
             if (this.moveup) {
-                this.sprite.y -= (dt/1000*this.speed);
+                this.sprite.y -= (dt*this.speed);
             }    
         } else {
             // firing!!!
-            this.fire_delta += (dt/1000);
+            this.fire_delta += (dt);
             if (this.fire_delta>this.fire_rate) {
                 //console.log("bullet now");
                 let bg = this.scene.get_nearest_badguy();
@@ -141,8 +141,8 @@ class Bullet {
             this.alive = false;
         }
         if (this.alive) {
-            this.sprite.x += (this.dx * dt/1000);
-            this.sprite.y += (this.dy * dt/1000);    
+            this.sprite.x += (this.dx * dt);
+            this.sprite.y += (this.dy * dt);    
         }
     }
     remove() {
@@ -181,6 +181,7 @@ class GameScene extends Phaser.Scene {
     update(timestep, dt) {
         // timestep always going up
         // dt is in ms
+        dt  = dt/1000.0;
         this.player.update(timestep,dt);
         this.badguy.update(timestep,dt);
         for (let i=0;i<this.bullets.length;i++) {
