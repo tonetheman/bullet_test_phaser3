@@ -2,7 +2,7 @@
 let game = null;
 let W = 600;
 let H = 800;
-let BULLET_SPEED = 80;
+let BULLET_SPEED = 200;
 
 let scenes = [];
 let gameConfig = {
