@@ -3,7 +3,7 @@ let game = null;
 let W = 600;
 let H = 800;
 let BULLET_SPEED = 200;
-let BADGUYCOUNT=3;
+let BADGUYCOUNT=10;
 let PLAYER_FIRE_RATE = 0.3;
 
 let scenes = [];
@@ -193,12 +193,15 @@ class BulletSprite extends Phaser.GameObjects.Sprite {
     }
     check_for_collision() {
         let bads = this.scene.badguy_group.getChildren();
+        //console.log(this.x,this.y);
         for (let i=0;i<bads.length;i++) {
             let b = bads[i];
+            //console.log("\tbads[i]",b.x,b.y);
             if ((this.x>=b.x) && (this.x<=(b.x+16))) {
                 // possible hit with x
                 if ((this.y>=b.y) && (this.y<=b.y+16)) {
                     console.log("hit");
+                    this.scene.badguy_group.killAndHide(b);
                 }
             }
         }
@@ -214,9 +217,7 @@ class BulletSprite extends Phaser.GameObjects.Sprite {
             this.x += (this.dx * dt);
             this.y += (this.dy * dt);    
         }
-    }
-    check_for_collision() {
-
+        //this.check_for_collision();
     }
 }
 
