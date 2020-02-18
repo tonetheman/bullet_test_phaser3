@@ -119,6 +119,9 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
         this.moveup = false;
         this.movedown = false;
 
+        this.dx = 0;
+        this.dy = 0;
+
         this.fire_rate = PLAYER_FIRE_RATE;
         this.fire_delta = 0;
     }
@@ -136,40 +139,36 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
             this.movedown = true;
         }
     }
+    compute_dx() {
+        let angle = Math.atan2(ptr.y-this.y,ptr.x-this.x);
+        this.dx = this.speed*Math.cos(angle);
+        this.dy = this.speed*Math.sin(angle);
+    }
     pointerdown(ptr) {
+        console.log("moving");
         this.moving = true;
-        this.chkptr(ptr);
+        //this.chkptr(ptr);
+        
+        this.compute_dx();
     }
     pointerup() {
+        console.log("not moving");
         this.moving = false;
         this.resetflags();
     }
     pointermove(ptr) {
         if (this.moving) {
-            this.chkptr(ptr);
+            //this.chkptr(ptr);
+            this.compute_dx();
         }
     }
     resetflags() {
-        this.moveleft = false;
-        this.moveright = false;
-        this.movedown = false;
-        this.moveup = false;
     }
     update(ts,dt) {
         dt=dt/1000.0;
         if (this.moving) {
-            if (this.moveleft) {
-                this.x -= (dt*this.speed);
-            }
-            if (this.moveright) {
-                this.x += (dt* this.speed);
-            }
-            if (this.movedown) {
-                this.y += (dt*this.speed);
-            }
-            if (this.moveup) {
-                this.y -= (dt*this.speed);
-            }    
+            this.x += (dt*this.dx);
+            this.y += (dt*this.dy);
         } else {
             // firing!!!
             this.fire_delta += (dt);
@@ -294,6 +293,7 @@ class GameScene extends Phaser.Scene {
         let player = new PlayerSprite(this,W/2,H/2,"player");
         this.player_group.add(player);
         this.input.on("pointerdown", (ptr) => {
+            console.log("input down");
             player.pointerdown(ptr);
         });
         this.input.on("pointerup", (ptr) => {
