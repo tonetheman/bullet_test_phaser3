@@ -310,7 +310,7 @@ function mainline() {
     scenes.push(GameScene);
     game = new Phaser.Game(gameConfig);
     window.focus();
-    resize();
+    //resize();
     game.scene.start("boot");
 }
 
