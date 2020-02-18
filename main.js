@@ -39,7 +39,7 @@ class BootScene extends Phaser.Scene {
             },
             active: function ()
             {
-                me.add.text(32, 32, 'just\nstand\nstill...', 
+                me.add.text(32, 32, 'you cant\nshoot\nand run', 
                     { fontFamily: 'cent', fontSize: 64, color: '#ff0000' })
                     .setShadow(2, 2, "#333333", 2, false, true);
                 me.add.text(150, 350, 'tony\ncolston', 
@@ -54,6 +54,13 @@ class BootScene extends Phaser.Scene {
     }
     update() {
 
+    }
+}
+
+class PowerupSprite extends Phaser.GameObjects.Sprite {
+    constructor(scene,x,y,key) {
+        super(scene,x,y,key);
+        scene.add.existing(this);
     }
 }
 
@@ -193,16 +200,11 @@ class BulletSprite extends Phaser.GameObjects.Sprite {
     }
     check_for_collision() {
         let bads = this.scene.badguy_group.getChildren();
-        //console.log(this.x,this.y);
         for (let i=0;i<bads.length;i++) {
             let b = bads[i];
             if (!b.active) continue;
-            //console.log("\tbads[i]",b.x,b.y);
             if ((this.x>=b.x) && (this.x<=(b.x+16))) {
-                // possible hit with x
                 if ((this.y>=b.y) && (this.y<=b.y+16)) {
-                    //console.log("hit");
-                    //console.log(this.scene.badguy_group);
                     this.scene.badguy_group.killAndHide(b);
                 }
             }
@@ -233,9 +235,9 @@ class GameScene extends Phaser.Scene {
         this.load.image("badguy", "CadetBlue.png");
         this.load.image("player", "IndianRed.png");
         this.load.image("bullet", "AntiqueWhite.png");
+        this.load.image("powerup", "GreenYellow.png");
     }
     get_nearest_badguy(x,y) {
-        // not working
         let a = this.badguy_group.getChildren();
         let index = -1;
         let m = 1000000;
@@ -268,6 +270,17 @@ class GameScene extends Phaser.Scene {
         this.badguy_group = this.add.group();
         this.badguy_group.runChildUpdate = true;
 
+        this.powerup_group = this.add.group();
+        //this.powerup_group.runChildUpdate = true;
+        
+        this.powerup_group.add(
+            new PowerupSprite(this,
+                //Phaser.Math.Between(0,W),
+                //Phaser.Math.Between(0,H),
+                200,200,
+                "powerup")
+        );
+
         for (let i=0;i<BADGUYCOUNT;i++) {
             let dx = Phaser.Math.Between(-150,150);
             let dy = Phaser.Math.Between(-150,150);
@@ -276,6 +289,7 @@ class GameScene extends Phaser.Scene {
             this.badguy_group.add(
                 new SimpleBadGuy(this,x,y,"badguy",dx,dy))
         }
+
 
         let player = new PlayerSprite(this,W/2,H/2,"player");
         this.player_group.add(player);
