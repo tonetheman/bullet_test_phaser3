@@ -258,7 +258,7 @@ class GameScene extends Phaser.Scene {
                 new SimpleBadGuy(this,x,y,"badguy",dx,dy))
         }
 
-        let player = new PlayerSprite(this,400,150,"player");
+        let player = new PlayerSprite(this,W/2,H/2,"player");
         this.player_group.add(player);
         this.input.on("pointerdown", (ptr) => {
             player.pointerdown(ptr);
@@ -277,7 +277,7 @@ function mainline() {
     scenes.push(GameScene);
     game = new Phaser.Game(gameConfig);
     window.focus();
-    //resize();
+    resize();
     game.scene.start("boot");
 }
 
