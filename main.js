@@ -20,11 +20,40 @@ class BootScene extends Phaser.Scene {
     constructor() {
         super("boot");
     }
+    init() {
+        let e = document.createElement("style");
+        document.head.appendChild(e);
+        let sheet = e.sheet;
+        let styles = "@font-face {font-family: \"cent\"; src : url('fonts/Centurion Bold 8x8.ttf')";
+        sheet.insertRule(styles,0);
+    }
     preload() {
-        
+        this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
     }
     create() {
-        this.scene.start("game");
+        //this.scene.start("game");
+        let me = this;
+        WebFont.load({
+            custom: {
+                families: [ "cent" ]
+            },
+            active: function ()
+            {
+                me.add.text(32, 32, 'just\nstand\nstill...', 
+                    { fontFamily: 'cent', fontSize: 64, color: '#ff0000' })
+                    .setShadow(2, 2, "#333333", 2, false, true);
+                me.add.text(150, 350, 'tony\ncolston', 
+                { fontFamily: 'cent', fontSize: 32, color: '#5656ee' });
+
+                // delay in ms
+                var timer = me.time.delayedCall(2000, ()=>{
+                    me.scene.start("game");
+                });  // delay in ms
+            }
+        });
+    }
+    update() {
+
     }
 }
 
