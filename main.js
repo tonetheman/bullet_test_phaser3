@@ -125,33 +125,16 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
         this.fire_rate = PLAYER_FIRE_RATE;
         this.fire_delta = 0;
     }
-    chkptr(ptr) {
-        this.resetflags();
-        if (ptr.x>this.x) {
-            this.moveright = true;
-        } else if (ptr.x<this.x) {
-            this.moveleft = true;
-        }
-        if (ptr.y<this.y) {
-            this.moveup = true;
-        }
-        if (ptr.y>this.y) {
-            this.movedown = true;
-        }
-    }
     compute_dx(ptr) {
         let angle = Math.atan2(ptr.y-this.y,ptr.x-this.x);
         this.dx = this.speed*Math.cos(angle);
         this.dy = this.speed*Math.sin(angle);
     }
     pointerdown(ptr) {
-        console.log("moving");
-        this.moving = true;
-        
+        this.moving = true;        
         this.compute_dx(ptr);
     }
     pointerup() {
-        console.log("not moving");
         this.moving = false;
         this.resetflags();
     }
@@ -291,7 +274,6 @@ class GameScene extends Phaser.Scene {
         let player = new PlayerSprite(this,W/2,H/2,"player");
         this.player_group.add(player);
         this.input.on("pointerdown", (ptr) => {
-            console.log("input down");
             player.pointerdown(ptr);
         });
         this.input.on("pointerup", (ptr) => {
