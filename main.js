@@ -3,7 +3,7 @@ let game = null;
 let W = 360;
 let H = 640;
 let BULLET_SPEED = 250;
-let BADGUYCOUNT=50;
+let BADGUYCOUNT=100;
 let PLAYER_FIRE_RATE = 0.3;
 
 let scenes = [];
@@ -15,6 +15,24 @@ let gameConfig = {
     title : "bullet",
     pixelArt : true
 };
+
+class EndLevelScene extends Phaser.Scene {
+    constructor() {
+        super("endlevel");
+    }
+    init(data) {
+        console.log("there is an init?",data);
+    }
+    preload() {
+        console.log("preload");
+    }
+    create() {
+        console.log("create called");
+        this.add.text(32, 32, 'fin', 
+                    { fontFamily: 'cent', fontSize: 32, color: '#ff0000' })
+                    .setShadow(2, 2, "#333333", 2, false, true);
+    }
+}
 
 class BootScene extends Phaser.Scene {
     constructor() {
@@ -319,9 +337,10 @@ class GameScene extends Phaser.Scene {
     }
     update() {
         if (this.badguy_group.countActive()==0) {
-            // TODO: switch to another scene?
-            console.log("done");
+
+            // TODO: unpause it at point point
             this.scene.manager.pause("game");
+            this.scene.start("endlevel", { crud : 200});
         }
     }
 }
@@ -329,6 +348,7 @@ class GameScene extends Phaser.Scene {
 function mainline() {
     scenes.push(BootScene);
     scenes.push(GameScene);
+    scenes.push(EndLevelScene);
     game = new Phaser.Game(gameConfig);
     window.focus();
     resize();
