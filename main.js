@@ -139,7 +139,7 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
             this.movedown = true;
         }
     }
-    compute_dx() {
+    compute_dx(ptr) {
         let angle = Math.atan2(ptr.y-this.y,ptr.x-this.x);
         this.dx = this.speed*Math.cos(angle);
         this.dy = this.speed*Math.sin(angle);
@@ -147,9 +147,8 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
     pointerdown(ptr) {
         console.log("moving");
         this.moving = true;
-        //this.chkptr(ptr);
         
-        this.compute_dx();
+        this.compute_dx(ptr);
     }
     pointerup() {
         console.log("not moving");
@@ -158,8 +157,7 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
     }
     pointermove(ptr) {
         if (this.moving) {
-            //this.chkptr(ptr);
-            this.compute_dx();
+            this.compute_dx(ptr);
         }
     }
     resetflags() {
