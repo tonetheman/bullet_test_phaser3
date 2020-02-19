@@ -1,7 +1,7 @@
 
 let game = null;
-let W = 600;
-let H = 800;
+let W = 360;
+let H = 640;
 let BULLET_SPEED = 250;
 let BADGUYCOUNT=50;
 let PLAYER_FIRE_RATE = 0.3;
@@ -40,10 +40,10 @@ class BootScene extends Phaser.Scene {
             active: function ()
             {
                 me.add.text(32, 32, 'you cant\nshoot\nand run', 
-                    { fontFamily: 'cent', fontSize: 64, color: '#ff0000' })
+                    { fontFamily: 'cent', fontSize: 32, color: '#ff0000' })
                     .setShadow(2, 2, "#333333", 2, false, true);
                 me.add.text(150, 350, 'tony\ncolston', 
-                { fontFamily: 'cent', fontSize: 32, color: '#5656ee' });
+                { fontFamily: 'cent', fontSize: 24, color: '#5656ee' });
 
                 // delay in ms
                 var timer = me.time.delayedCall(2000, ()=>{
@@ -148,6 +148,20 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
     }
     resetflags() {
     }
+    bounds() {
+        if (this.x>W) {
+            this.x = 0;
+        }
+        if (this.x<0) {
+            this.x = W;
+        }
+        if (this.y>H) {
+            this.y = 0;
+        }
+        if (this.y<0) {
+            this.y = H;
+        }
+    }
     update(ts,dt) {
         dt=dt/1000.0;
         if (this.moving) {
@@ -168,6 +182,7 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
                 this.fire_delta = 0;
             }
         }
+        this.bounds();
     }
 
 }
@@ -308,7 +323,7 @@ function mainline() {
     scenes.push(GameScene);
     game = new Phaser.Game(gameConfig);
     window.focus();
-    //resize();
+    resize();
     game.scene.start("boot");
 }
 
