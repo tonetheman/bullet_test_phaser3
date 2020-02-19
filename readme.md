@@ -1,13 +1,24 @@
 
+# todo
 
-# change movement
+- player has concept of health
+- show health in scene
 
-move towards pointer
+- make sure player can die
+- player death should stop the scene movement
+- need a way to restart the scene after death
 
-compute angle from  player to pointer
+- need collisions with melee bads to kill/harm player
+    - current bads are melee only
 
-Math.atan2(ptr.y-player.y,ptr.x-player.x);
+- need example casting bad
+    - need to make sure casting bads can cause harm/kill player
+    - be nice to have circular casting bullets (changes to collision detection)
+    - get bullets to work first
+    
+- Need to load a level with blocks (constrained movement)
 
-then do same sort of
-velx = Math.cos(angle) * speed;
-vely = Math.sin(angle) * speed;
+- make an example powerup
+
+
+
