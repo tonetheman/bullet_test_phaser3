@@ -269,6 +269,7 @@ class GameScene extends Phaser.Scene {
         return a[0];
     }
     create() {
+        console.log(this);
         this.player_group = this.add.group();
         this.player_group.runChildUpdate = true;
 
@@ -315,6 +316,13 @@ class GameScene extends Phaser.Scene {
         tmp.originX = 0;
         tmp.originY = 0;
         this.add.existing(tmp);
+    }
+    update() {
+        if (this.badguy_group.countActive()==0) {
+            // TODO: switch to another scene?
+            console.log("done");
+            this.scene.manager.pause("game");
+        }
     }
 }
 
