@@ -2,8 +2,8 @@
 let game = null;
 let W = 600;
 let H = 800;
-let BULLET_SPEED = 200;
-let BADGUYCOUNT=30;
+let BULLET_SPEED = 250;
+let BADGUYCOUNT=5;
 let PLAYER_FIRE_RATE = 0.3;
 
 let scenes = [];
@@ -95,6 +95,9 @@ class SimpleBadGuy extends BadGuySprite {
         super(scene,x,y,key);
         this.dx = dx;
         this.dy = dy;
+        //
+        //this.originX = 0;
+        //this.originY = 0;
     }
     update(ts,dt) {
         dt = dt/1000;
@@ -183,10 +186,26 @@ class BulletSprite extends Phaser.GameObjects.Sprite {
         for (let i=0;i<bads.length;i++) {
             let b = bads[i];
             if (!b.active) continue;
-            if ((this.x>=b.x) && (this.x<=(b.x+16))) {
-                if ((this.y>=b.y) && (this.y<=b.y+16)) {
+
+            /*
+            bullet x extends to x-4 and x+4
+            badguy x extends to x-8 and x+8
+            */
+            let bulletEdgeTop = this.y-4;
+            let bulletEdgeRight = this.x+4;
+            let bulletEdgeLeft = this.x-4;
+            let bulletEdgeBottom = this.y+4;
+
+            let badEdgeTop = b.y-8;
+            let badEdgeRight = b.x+8;
+            let badEdgeLeft = b.x-8;
+            let badEdgeBottom = b.y+8;
+
+            if( (bulletEdgeLeft < badEdgeRight) && 
+                (bulletEdgeRight > badEdgeLeft) && 
+                (bulletEdgeBottom < badEdgeTop) &&
+                (bulletEdgeTop > badEdgeBottom)){
                     this.scene.badguy_group.killAndHide(b);
-                }
             }
         }
     }
@@ -212,10 +231,12 @@ class GameScene extends Phaser.Scene {
         this.badguy_group = null;
     }
     preload() {
+        // by default phaser loads the x and y origin point to be in the middle
         this.load.image("badguy", "CadetBlue.png");
         this.load.image("player", "IndianRed.png");
         this.load.image("bullet", "AntiqueWhite.png");
         this.load.image("powerup", "GreenYellow.png");
+        this.load.image("magenta", "magenta.png");
     }
     get_nearest_badguy(x,y) {
         let a = this.badguy_group.getChildren();
@@ -282,6 +303,11 @@ class GameScene extends Phaser.Scene {
         this.input.on("pointermove", (ptr) => {
             player.pointermove(ptr);
         });
+
+        let tmp = new Phaser.GameObjects.Sprite(this,W/2+8,H/2+8,"magenta");
+        tmp.originX = 0;
+        tmp.originY = 0;
+        this.add.existing(tmp);
     }
 }
 
