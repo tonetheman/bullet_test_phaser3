@@ -3,7 +3,7 @@ let game = null;
 let W = 600;
 let H = 800;
 let BULLET_SPEED = 250;
-let BADGUYCOUNT=5;
+let BADGUYCOUNT=50;
 let PLAYER_FIRE_RATE = 0.3;
 
 let scenes = [];
@@ -188,26 +188,18 @@ class BulletSprite extends Phaser.GameObjects.Sprite {
             if (!b.active) continue;
 
             /*
-            bullet x extends to x-4 and x+4
-            badguy x extends to x-8 and x+8
+                got idea for this from an answer here
+                my game is box aligned so this should work
+                https://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
             */
-            let bulletEdgeTop = this.y-4;
-            let bulletEdgeRight = this.x+4;
-            let bulletEdgeLeft = this.x-4;
-            let bulletEdgeBottom = this.y+4;
-
-            let badEdgeTop = b.y-8;
-            let badEdgeRight = b.x+8;
-            let badEdgeLeft = b.x-8;
-            let badEdgeBottom = b.y+8;
-
-            if( (bulletEdgeLeft < badEdgeRight) && 
-                (bulletEdgeRight > badEdgeLeft) && 
-                (bulletEdgeBottom < badEdgeTop) &&
-                (bulletEdgeTop > badEdgeBottom)){
-                    this.scene.badguy_group.killAndHide(b);
+            let res = (Math.abs(this.x-b.x) * 2 < (16+8)) &&
+            (Math.abs(this.y-b.y) * 2< (16+8))
+            if (res) {
+                this.scene.badguy_group.killAndHide(b);
             }
+            
         }
+        
     }
     update(ts,dt) {
         dt=dt/1000.0;
