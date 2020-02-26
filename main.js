@@ -345,6 +345,9 @@ class GameScene extends Phaser.Scene {
     update() {
         this.health.setText(this.player.base_health);
 
+        // TODO: add code here to check for bad guy collision
+        // to the player
+
         if (this.badguy_group.countActive()==0) {
             // TODO: unpause it at point point
             this.scene.manager.pause("game");
