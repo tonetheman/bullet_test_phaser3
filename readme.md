@@ -18,7 +18,7 @@
     
 - Need to load a level with blocks (constrained movement)
 
-- make an example powerup
+- DONE: make an example powerup
 
 
 

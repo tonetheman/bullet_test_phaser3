@@ -360,6 +360,20 @@ class GameScene extends Phaser.Scene {
                 this.player.base_health -= 10;
             }
         }
+
+        
+        let p = this.powerup_group.getChildren();
+        for (let i=0;i<p.length;i++) {
+            if (!p[i].active) continue;
+            if (collision_check(this.player,p[i])) {
+                // do something here
+                this.powerup_group.killAndHide(p[i]);
+
+                // check powerup type
+                this.player.fire_rate = 0.1;
+            }
+        }
+        
         if (this.badguy_group.countActive()==0) {
             // TODO: unpause it at point point
             this.scene.manager.pause("game");
