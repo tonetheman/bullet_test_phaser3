@@ -3,7 +3,7 @@ let game = null;
 let W = 360;
 let H = 640;
 let BULLET_SPEED = 250;
-let BADGUYCOUNT=10;
+let BADGUYCOUNT=50;
 let PLAYER_FIRE_RATE = 0.5;
 
 let scenes = [];
@@ -208,6 +208,17 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
 
 }
 
+/*
+    got idea for this from an answer here
+    my game is box aligned so this should work
+    https://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
+*/
+function collision_check(a,b) {
+    let res = (Math.abs(a.x-b.x) * 2 < (16+8)) &&
+    (Math.abs(a.y-b.y) * 2< (16+8))
+    return res;
+}
+
 class BulletSprite extends Phaser.GameObjects.Sprite {
     constructor(scene,x,y,key,dx,dy) {
         super(scene,x,y,key);
@@ -223,13 +234,7 @@ class BulletSprite extends Phaser.GameObjects.Sprite {
             let b = bads[i];
             if (!b.active) continue;
 
-            /*
-                got idea for this from an answer here
-                my game is box aligned so this should work
-                https://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
-            */
-            let res = (Math.abs(this.x-b.x) * 2 < (16+8)) &&
-            (Math.abs(this.y-b.y) * 2< (16+8))
+            let res = collision_check(this,b);
             if (res) {
                 this.scene.badguy_group.killAndHide(b);
             }
@@ -345,9 +350,16 @@ class GameScene extends Phaser.Scene {
     update() {
         this.health.setText(this.player.base_health);
 
-        // TODO: add code here to check for bad guy collision
-        // to the player
-
+        // returns array reference
+        let b = this.badguy_group.getChildren();
+        // this happens too quickly :(
+        // but it works
+        for (let i=0;i<b.length;i++) {
+            if (!b[i].active) continue;
+            if (collision_check(this.player,b[i])) {
+                this.player.base_health -= 10;
+            }
+        }
         if (this.badguy_group.countActive()==0) {
             // TODO: unpause it at point point
             this.scene.manager.pause("game");
