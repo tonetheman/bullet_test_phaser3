@@ -350,6 +350,8 @@ class GameScene extends Phaser.Scene {
     update() {
         this.health.setText(this.player.base_health);
 
+
+        // logic for melee collisions
         // returns array reference
         let b = this.badguy_group.getChildren();
         // this happens too quickly :(
@@ -361,7 +363,8 @@ class GameScene extends Phaser.Scene {
             }
         }
 
-        
+
+        // logic for poweup collision
         let p = this.powerup_group.getChildren();
         for (let i=0;i<p.length;i++) {
             if (!p[i].active) continue;
@@ -374,7 +377,11 @@ class GameScene extends Phaser.Scene {
             }
         }
         
-        if (this.badguy_group.countActive()==0) {
+        // no more enemies
+        // or player is dead
+        if ((this.badguy_group.countActive()==0) || (
+            (this.player.base_health<0))
+        ) {
             // TODO: unpause it at point point
             this.scene.manager.pause("game");
             this.scene.start("endlevel", { crud : 200});
