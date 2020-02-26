@@ -1,8 +1,8 @@
 
 # todo
 
-- player has concept of health
-- show health in scene
+- DONE: player has concept of health
+- DONE: show health in scene
 
 - make sure player can die
 - player death should stop the scene movement
