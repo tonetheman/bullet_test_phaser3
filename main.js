@@ -3,8 +3,8 @@ let game = null;
 let W = 360;
 let H = 640;
 let BULLET_SPEED = 250;
-let BADGUYCOUNT=100;
-let PLAYER_FIRE_RATE = 0.3;
+let BADGUYCOUNT=10;
+let PLAYER_FIRE_RATE = 0.5;
 
 let scenes = [];
 let gameConfig = {
@@ -145,6 +145,9 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
 
         this.fire_rate = PLAYER_FIRE_RATE;
         this.fire_delta = 0;
+
+        //
+        this.base_health = 100;
     }
     compute_dx(ptr) {
         let angle = Math.atan2(ptr.y-this.y,ptr.x-this.x);
@@ -254,6 +257,7 @@ class GameScene extends Phaser.Scene {
         super("game");
         this.bullet_group = null;
         this.badguy_group = null;
+        this.player = null; // need a reference for score
     }
     preload() {
         // by default phaser loads the x and y origin point to be in the middle
@@ -287,7 +291,7 @@ class GameScene extends Phaser.Scene {
         return a[0];
     }
     create() {
-        console.log(this);
+        // console.log(this);
         this.player_group = this.add.group();
         this.player_group.runChildUpdate = true;
 
@@ -319,6 +323,7 @@ class GameScene extends Phaser.Scene {
 
 
         let player = new PlayerSprite(this,W/2,H/2,"player");
+        this.player = player;
         this.player_group.add(player);
         this.input.on("pointerdown", (ptr) => {
             player.pointerdown(ptr);
@@ -334,10 +339,13 @@ class GameScene extends Phaser.Scene {
         tmp.originX = 0;
         tmp.originY = 0;
         this.add.existing(tmp);
+
+        this.health = this.add.text(0,0,player.base_health);
     }
     update() {
-        if (this.badguy_group.countActive()==0) {
+        this.health.setText(this.player.base_health);
 
+        if (this.badguy_group.countActive()==0) {
             // TODO: unpause it at point point
             this.scene.manager.pause("game");
             this.scene.start("endlevel", { crud : 200});
