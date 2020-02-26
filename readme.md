@@ -6,6 +6,7 @@
 - need simple menu to pick level
 - Need to load a level with blocks (constrained movement)
 - can i use easystar js
+    - https://www.dynetisgames.com/2018/03/06/pathfinding-easystar-phaser-3/
 
 - DONE: download easystar check in min.js
 - DONE: player has concept of health
