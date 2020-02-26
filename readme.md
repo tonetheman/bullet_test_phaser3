@@ -7,7 +7,7 @@
 - Need to load a level with blocks (constrained movement)
 - can i use easystar js
 
-
+- DONE: download easystar check in min.js
 - DONE: player has concept of health
 - DONE: show health in scene
 - DONE: make sure player can die
