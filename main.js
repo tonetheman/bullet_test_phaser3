@@ -31,6 +31,13 @@ class EndLevelScene extends Phaser.Scene {
         this.add.text(32, 32, 'fin', 
                     { fontFamily: 'cent', fontSize: 32, color: '#ff0000' })
                     .setShadow(2, 2, "#333333", 2, false, true);
+
+        this.input.on("pointerup", () => {
+            console.log("now");
+            // this should stop the current scene and
+            // start this scene
+            this.scene.start("game", { crud : 100});
+        })
     }
 }
 
@@ -296,7 +303,12 @@ class GameScene extends Phaser.Scene {
         return a[0];
     }
     create() {
-        // console.log(this);
+
+        // to change background color
+        // do this
+        // not sure what to pick
+        //this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor("#D3D3D3");
+        
         this.player_group = this.add.group();
         this.player_group.runChildUpdate = true;
 
@@ -382,8 +394,7 @@ class GameScene extends Phaser.Scene {
         if ((this.badguy_group.countActive()==0) || (
             (this.player.base_health<0))
         ) {
-            // TODO: unpause it at point point
-            this.scene.manager.pause("game");
+            //this.scene.manager.pause("game");
             this.scene.start("endlevel", { crud : 200});
         }
     }
