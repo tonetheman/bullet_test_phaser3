@@ -3,7 +3,7 @@ let game = null;
 let W = 360;
 let H = 640;
 let BULLET_SPEED = 250;
-let BADGUYCOUNT=50;
+let BADGUYCOUNT=10;
 let PLAYER_FIRE_RATE = 0.5;
 
 let scenes = [];
@@ -190,11 +190,28 @@ class PlayerSprite extends Phaser.GameObjects.Sprite {
             this.y = H;
         }
     }
+    check_for_collision() {
+        let blockers = this.scene.blocker_group.getChildren();
+        for(let i=0;i<blockers.length;i++) {
+            let b = blockers[i];
+            let res = collision_check(this,b);
+            if (res) {
+                return true;
+            }
+        }
+        return false;
+    }
     update(ts,dt) {
         dt=dt/1000.0;
         if (this.moving) {
+            let old_x = this.x;
+            let old_y = this.y;
             this.x += (dt*this.dx);
             this.y += (dt*this.dy);
+            if (this.check_for_collision()) {
+                this.x = old_x;
+                this.y = old_y;
+            }
         } else {
             // firing!!!
             this.fire_delta += (dt);
@@ -271,6 +288,7 @@ class GameScene extends Phaser.Scene {
         this.badguy_group = null;
         this.player = null; // need a reference for score
     }
+    
     preload() {
         // by default phaser loads the x and y origin point to be in the middle
         this.load.image("badguy", "CadetBlue.png");
@@ -278,7 +296,10 @@ class GameScene extends Phaser.Scene {
         this.load.image("bullet", "AntiqueWhite.png");
         this.load.image("powerup", "GreenYellow.png");
         this.load.image("magenta", "magenta.png");
+        this.load.image("shotgun_pickup", "shotgun8x8_pickup.png");
+        this.load.image("blocker", "blocker.png");
     }
+
     get_nearest_badguy(x,y) {
         let a = this.badguy_group.getChildren();
         let index = -1;
@@ -312,6 +333,8 @@ class GameScene extends Phaser.Scene {
         this.player_group = this.add.group();
         this.player_group.runChildUpdate = true;
 
+        this.blocker_group = this.add.group();
+
         this.bullet_group = this.add.group();
         this.bullet_group.runChildUpdate = true;
 
@@ -319,8 +342,8 @@ class GameScene extends Phaser.Scene {
         this.badguy_group.runChildUpdate = true;
 
         this.powerup_group = this.add.group();
-        //this.powerup_group.runChildUpdate = true;
         
+
         this.powerup_group.add(
             new PowerupSprite(this,
                 //Phaser.Math.Between(0,W),
@@ -338,6 +361,13 @@ class GameScene extends Phaser.Scene {
                 new SimpleBadGuy(this,x,y,"badguy",dx,dy))
         }
 
+        for(let i=0;i<10;i++) {
+            // add blockers
+            this.blocker_group.add(
+                this.add.image(Phaser.Math.Between(0,W),
+                    Phaser.Math.Between(0,H),"blocker")
+            );
+        }
 
         let player = new PlayerSprite(this,W/2,H/2,"player");
         this.player = player;
