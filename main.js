@@ -3,7 +3,7 @@ let game = null;
 let W = 360;
 let H = 640;
 let BULLET_SPEED = 250;
-let BADGUYCOUNT=10;
+let BADGUYCOUNT=30;
 let PLAYER_FIRE_RATE = 0.5;
 
 let scenes = [];
